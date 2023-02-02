@@ -1,64 +1,80 @@
-import tkinter
+
+from tkinter import ttk
+from tkinter import Tk
 import tkinter.messagebox
+import tkinter
+import TKinterModernThemes as TKMT
 import pickle
 
-root = tkinter.Tk()
-root.title("Task List")
+
+def buttonCMD():
+    print("Button clicked!")
+
+start = tkinter.Tk()
+start.title("Task List")
+style = ttk.Style(start)
+start.option_add("*tearOff", False)
+# start.tk.call("source", "forest-dark.tcl")
+# style.theme_use("forest-dark")
 
 def add():
-    task = entry_task.get()
-    if task != "":
-        listbox_tasks.insert(tkinter.END, task)
-        entry_task.delete(0, tkinter.END)
+    enterTask = task.get()
+    if enterTask != "":
+        ui_box.insert(tkinter.END, enterTask)
+        task.delete(0, tkinter.END)
     else:
+        # pop up warning
         tkinter.messagebox.showwarning(title="YOU SHALL NOT PASS.", message="You realize you left it blank, right? Enter a task!")
 
 def delete():
     try:
-        task_index = listbox_tasks.curselection()[0]
-        listbox_tasks.delete(task_index)
+        curr_elem = ui_box.curselection()[0]
+        ui_box.delete(curr_elem)
     except:
+        # pop up warning
         tkinter.messagebox.showwarning(title="YOU SHALL NOT PASS.", message="I'm not a mind reader. Please select the task you wish to delete.")
+
+def save():
+    savedTasks = ui_box.get(0, ui_box.size())
+    pickle.dump(savedTasks, open("tasks.dat", "wb"))
 
 def load():
     try:
-        tasks = pickle.load(open("tasks.dat", "rb"))
-        listbox_tasks.delete(0, tkinter.END)
-        for task in tasks:
-            listbox_tasks.insert(tkinter.END, task)
+        loadTasks = pickle.load(open("tasks.dat", "rb"))
+        ui_box.delete(0, tkinter.END)
+        for task in loadTasks:
+            ui_box.insert(tkinter.END, task)
     except:
+    # pop up warning
         tkinter.messagebox.showwarning(title="YOU SHALL NOT PASS", message="Cannot find tasks.dat.")
 
-def save():
-    tasks = listbox_tasks.get(0, listbox_tasks.size())
-    pickle.dump(tasks, open("tasks.dat", "wb"))
+# user interface using tkinter module
+make_pretty = tkinter.Frame(start)
+make_pretty.pack()
 
-# Create GUI
-frame_tasks = tkinter.Frame(root)
-frame_tasks.pack()
+ui_box = tkinter.Listbox(make_pretty, height=20, width=80)
+ui_box.pack(side=tkinter.LEFT)
 
-listbox_tasks = tkinter.Listbox(frame_tasks, height=10, width=50)
-listbox_tasks.pack(side=tkinter.LEFT)
+scrolling = tkinter.Scrollbar(make_pretty)
+scrolling.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 
-scrollbar_tasks = tkinter.Scrollbar(frame_tasks)
-scrollbar_tasks.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+ui_box.config(yscrollcommand=scrolling.set)
+scrolling.config(command=ui_box.yview)
 
-listbox_tasks.config(yscrollcommand=scrollbar_tasks.set)
-scrollbar_tasks.config(command=listbox_tasks.yview)
+task = tkinter.Entry(start, width=50)
+task.pack()
 
-entry_task = tkinter.Entry(root, width=50)
-entry_task.pack()
+click_add = tkinter.Button(start, text="Add", width=48, command=add)
+click_add.pack()
 
-button_add_task = tkinter.Button(root, text="Add", width=48, command=add)
-button_add_task.pack()
+click_delete = tkinter.Button(start, text="Delete", width=48, command=delete)
+click_delete.pack()
 
-button_delete_task = tkinter.Button(root, text="Delete", width=48, command=delete)
-button_delete_task.pack()
+click_load = tkinter.Button(start, text="Load", width=48, command=load)
+click_load.pack()
 
-button_load_tasks = tkinter.Button(root, text="Load", width=48, command=load)
-button_load_tasks.pack()
+click_save = tkinter.Button(start, text="Save", width=48, command=save)
+click_save.pack()
 
-button_save_tasks = tkinter.Button(root, text="Save", width=48, command=save)
-button_save_tasks.pack()
+start.mainloop()
 
-root.mainloop()
