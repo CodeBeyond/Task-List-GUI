@@ -17,6 +17,14 @@ start.option_add("*tearOff", False)
 # start.tk.call("source", "forest-dark.tcl")
 # style.theme_use("forest-dark")
 
+def get_tasks_from_server():
+    response = requests.get('http://localhost:3000/tasks')
+    if response.status_code == 200:
+        tasks = response.json().get('tasks')
+        return tasks
+    else:
+        raise Exception('Request to Task Server failed with status code: {}'.format(response.status_code))
+
 def add():
     enterTask = task.get()
     if enterTask != "":
