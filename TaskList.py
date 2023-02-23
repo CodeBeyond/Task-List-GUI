@@ -5,6 +5,7 @@ import tkinter.messagebox
 import tkinter
 import TKinterModernThemes as TKMT
 import pickle
+import requests
 
 
 def buttonCMD():
@@ -14,8 +15,7 @@ start = tkinter.Tk()
 start.title("Task List")
 style = ttk.Style(start)
 start.option_add("*tearOff", False)
-# start.tk.call("source", "forest-dark.tcl")
-# style.theme_use("forest-dark")
+
 
 def get_tasks_from_server():
     response = requests.get('http://localhost:3000/tasks')
@@ -47,14 +47,11 @@ def save():
     pickle.dump(savedTasks, open("tasks.dat", "wb"))
 
 def load():
-    try:
-        loadTasks = pickle.load(open("tasks.dat", "rb"))
-        ui_box.delete(0, tkinter.END)
-        for task in loadTasks:
-            ui_box.insert(tkinter.END, task)
-    except:
-    # pop up warning
-        tkinter.messagebox.showwarning(title="YOU SHALL NOT PASS", message="Cannot find tasks.dat.")
+    loadTasks = get_tasks_from_server()
+    ui_box.delete(0, tkinter.END)
+    for task in loadTasks:
+        ui_box.insert(tkinter.END, task)
+
 
 # user interface using tkinter module
 make_pretty = tkinter.Frame(start)
@@ -85,4 +82,3 @@ click_save = tkinter.Button(start, text="Save", width=48, command=save)
 click_save.pack()
 
 start.mainloop()
-
